@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Doodle Crash Jump</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="scale-root">
+      <main class="app">
+        <header class="titlebar">
+          <div>
+            <h1>Doodle Crash Jump</h1>
+            <p>Jump higher, multiplier climbs. Cash out before the crash.</p>
+          </div>
+          <div class="rtp">RTP 96%</div>
+        </header>
+
+        <section class="game-wrap">
+          <canvas id="game" width="360" height="640"></canvas>
+          <div class="controls">Use ◀ ▶ arrow keys to move</div>
+        </section>
+
+        <section class="control-bar">
+          <div class="bet-wrap">
+            <span class="label">Bet</span>
+            <div class="bet-row">
+              <span>$</span>
+              <input id="betInput" type="number" min="1" step="1" value="10" />
+            </div>
+          </div>
+          <button id="startBtn">Start</button>
+          <button id="cashoutBtn" disabled>Cashout</button>
+        </section>
+
+        <section class="info-row">
+          <div class="info-item">
+            <span>Balance</span>
+            <strong id="balance">$0.00</strong>
+          </div>
+          <div class="info-item">
+            <span>Height</span>
+            <strong id="height">0</strong>
+          </div>
+          <div id="message" class="message">Place a bet and start.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="game.js"></script>
+  </body>
+</html>
