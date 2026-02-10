@@ -12,6 +12,12 @@ const ui = {
 
 const app = document.querySelector(".app");
 const scaleRoot = document.querySelector(".scale-root");
+const sfx = {
+  pop: document.getElementById("sfxPop"),
+  crack: document.getElementById("sfxCrack"),
+};
+if (sfx.pop) sfx.pop.volume = 0.45;
+if (sfx.crack) sfx.crack.volume = 0.6;
 
 const W = canvas.width;
 const H = canvas.height;
@@ -35,6 +41,7 @@ const state = {
   heightClimbed: 0,
   crashMult: 0,
   crashArmed: false,
+  lossSoundPlayed: false,
 };
 
 let player = {
@@ -60,6 +67,27 @@ function setMessage(text) {
   ui.message.textContent = text;
   fitToViewport();
 }
+
+function playSfx(audio) {
+  if (!audio) return;
+  audio.currentTime = 0;
+  audio.play().catch(() => {});
+}
+
+function primeAudio() {
+  if (primeAudio.done) return;
+  [sfx.pop, sfx.crack].forEach((audio) => {
+    if (!audio) return;
+    audio.play()
+      .then(() => {
+        audio.pause();
+        audio.currentTime = 0;
+      })
+      .catch(() => {});
+  });
+  primeAudio.done = true;
+}
+primeAudio.done = false;
 
 function updateHud() {
   ui.balance.textContent = formatMoney(state.balance);
@@ -118,10 +146,12 @@ function startRound() {
   state.heightClimbed = 0;
   state.crashMult = sampleCrashMultiplier();
   state.crashArmed = false;
+  state.lossSoundPlayed = false;
 
   resetPlayer();
   resetPlatforms();
 
+  primeAudio();
   setMessage("Round started. Climb and cash out!");
   updateHud();
 }
@@ -141,6 +171,10 @@ function endRoundLoss() {
   const crashText = state.crashArmed
     ? `Crashed at ${state.multiplier.toFixed(2)}x.`
     : "Fell off.";
+  if (!state.lossSoundPlayed) {
+    playSfx(sfx.crack);
+    state.lossSoundPlayed = true;
+  }
   state.mode = "ended";
   setMessage(`${crashText} Lost ${formatMoney(state.bet)}.`);
   updateHud();
@@ -175,7 +209,12 @@ function handleCollision(prevY) {
         platform.type = "break";
         state.mode = "crashing";
         player.vy = 2;
+        if (!state.lossSoundPlayed) {
+          playSfx(sfx.crack);
+          state.lossSoundPlayed = true;
+        }
       } else {
+        playSfx(sfx.pop);
         player.vy = JUMP_VELOCITY;
       }
       break;
